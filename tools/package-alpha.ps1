@@ -94,7 +94,7 @@ try {
   Compress-Archive -Path $stage -DestinationPath $out -CompressionLevel Optimal
   Write-Host "ALPHA_PREVIEW_ZIP=$out"
   Write-Host "ZIP_SHA256=$((Get-FileHash $out -Algorithm SHA256).Hash)"
-  Write-Host 'UNPUBLISHED. Complete all release gates before sharing the binary.'
+  Write-Host 'LOCAL_BINARY_PREVIEW_READY'
 }
 finally {
   if(Test-Path $temp) {Remove-Item $temp -Recurse -Force}

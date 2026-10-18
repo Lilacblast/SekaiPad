@@ -1,5 +1,5 @@
 name: Bug report (sanitized)
-description: Report a reproducible bug without credentials or private input captures
+description: Report a reproducible bug with sanitized diagnostics
 labels: [bug]
 body:
   - type: markdown

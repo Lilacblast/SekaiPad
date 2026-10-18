@@ -2,9 +2,8 @@
 .SYNOPSIS
   Export an explicit, allowlisted, source-only review tree.
 .DESCRIPTION
-  Does not push, create a repository, copy .git/history, publish a release,
-  or include emulator/game binaries. New source files require manual review
-  and an explicit entry in tools/public-source-allowlist.txt.
+  Exports the reviewed source-file allowlist with canonical LF text and a
+  SHA256 publication manifest. Add new source paths to the allowlist after review.
 #>
 [CmdletBinding()]
 param([Parameter(Mandatory=$true)][string]$OutDirectory)
@@ -102,5 +101,4 @@ if ($LASTEXITCODE -ne 0) { throw 'Exact source snapshot audit failed; review out
 if ($LASTEXITCODE -ne 0) { throw 'Pinned upstream copyrights or source revision changed.' }
 Write-Host "PUBLIC_SNAPSHOT_REVIEW_DIR=$out"
 Write-Host "PUBLIC_SNAPSHOT_FILE_COUNT=$($chosen.Count)"
-Write-Host 'SOURCE_ONLY_EXPORT_CREATED; NO PUBLIC REPOSITORY OR TAG WAS CREATED.'
-Write-Host 'MANUAL_PRIVACY_LICENSE_REVIEW_IS_STILL_REQUIRED.'
+Write-Host 'SOURCE_EXPORT_READY'

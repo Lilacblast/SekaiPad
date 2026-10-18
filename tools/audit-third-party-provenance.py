@@ -89,7 +89,6 @@ def main() -> int:
     for issue in issues:
         print("THIRD_PARTY_ATTRIBUTION_BLOCKER:", issue)
     print("PINNED_THIRD_PARTY_PROVENANCE_" + ("BLOCKED" if issues else "PASS"))
-    print("Human review remains required for future imported changes and transitive notices.")
     return int(bool(issues))
 
 

@@ -17,7 +17,7 @@ dotnet restore tests/SekaiPad.ScrcpySmoke/SekaiPad.ScrcpySmoke.csproj
 dotnet run --project tests/SekaiPad.ScrcpySmoke/SekaiPad.ScrcpySmoke.csproj -c Release --no-restore
 ```
 
-Run Windows UI/HID/input-suppression smoke tests only in an interactive desktop. They can affect the current Windows input session; **do not run them on hosted CI** or when a game is active.
+Run hardware/input-isolation tests on an attended Windows desktop with a physical keyboard. Hosted CI runs synthetic tests.
 
 ## Portable preview
 
@@ -27,12 +27,12 @@ After a clean-source review and compilation, run:
 ./tools/package-alpha.ps1 -Version '0.1.0-alpha'
 ```
 
-The ZIP is **framework-dependent**, not an installer. It includes neither .NET Desktop Runtime nor scrcpy-server, MuMu binaries, Project SEKAI data, private SDK caches or credentials. GitHub Actions compiles and audits this ZIP on the runner, while uploading binaries only through a separate restricted, opt-in private workflow.
+The Windows ZIP requires the .NET 10 Desktop Runtime. Set up MuMu, the game and scrcpy separately. CI verifies the compiled ZIP and third-party notices.
 
-After obtaining scrcpy v5.0 from the **official** Genymobile release, stage the extracted `scrcpy-server` locally into an **unpacked preview directory**, using `tools/stage-scrcpy-server.ps1`. Supply the trusted expected SHA256 for the strongest source verification. The staging helper verifies copied bytes, preserves already staged files, and refuses source Git checkouts and directory junctions. It does not download or execute the server. Do not commit or redistribute the staged server with SekaiPad by default.
+Obtain scrcpy v5.0 from Genymobile and use `tools/stage-scrcpy-server.ps1` to copy its server into an extracted preview. Supply the official SHA256 where available; the helper checks file integrity and protects existing files and source directories.
 
 For a built preview, run `python tools/audit-alpha-zip.py --root . --zip dist/SekaiPad-0.1.0-alpha-win-x64.zip` to check the exact ZIP member set, runtime versions and upstream license text before sharing it.
 
 ## Diagnostics
 
-Raw HID counts prove Windows decoded the pad; scrcpy packet counters prove local socket writes; the violet MuMu overlay displays mapped HID positions. Confirm actual Project SEKAI note judgments separately by testing hits, hold, slide, flick, chords and delay. F10 restores Windows input; F6 exits. Esc remains available to the emulator.
+HID counters show decoded touchpad reports, scrcpy counters show local packets, and purple markers show mapped contacts. Confirm note hits and timing in the game. F10 restores Windows input; F6 exits. Esc remains with the emulator.

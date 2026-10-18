@@ -56,7 +56,7 @@
             <CheckBox x:Name="HostTouchOverlayCheck" Margin="15,0,0,0"
                       IsChecked="False" Checked="HostTouchOverlay_Changed"
                       Unchecked="HostTouchOverlay_Changed"
-                      ToolTip="Diagnostic overlay. Keep off during play for minimum input/display latency."
+                      ToolTip="Show mapped touch positions on the MuMu window. Adds display work."
                       Foreground="#80519C" FontSize="13" VerticalAlignment="Center"
                       Content="Draw mapped touch circles over MuMu (diagnostics)"/>
         </StackPanel>
@@ -80,6 +80,6 @@
                  IsReadOnly="True" VerticalScrollBarVisibility="Auto" Height="132"
                  Padding="8" Background="White"/>
         <TextBlock Margin="0,12,0,0" TextWrapping="Wrap" Foreground="#666666"
-                   Text="Light finger contact = Android DOWN (no click). Lift = UP; moving contact = drag, slide, or flick. Default Full screen maps the whole pad to the whole landscape screen. The optional game-lanes mode emphasizes the judgment area. Changing mapping releases held contacts for safety. In rhythm mode the Windows mouse is frozen and its clicks/wheel are blocked (including an external mouse), while raw touchpad-to-Android continues. Windows three-/four-finger system gestures are also suspended during rhythm mode. F10 / disconnect / exit restores normal input. The keyboard and F6/F10 remain available. Lilac host overlay dots visualize mapped HID positions over MuMu even when Android Show taps does not draw markers for injected input; the scrcpy packet counters below help distinguish drawing from actual Android delivery."/>
+                   Text="Light touch sends DOWN; lifting releases it. Drag for slides and flicks. Full screen maps the whole pad; Lanes focuses the judgment area. Rhythm mode blocks all Windows mice and three-/four-finger gestures. F10 restores Windows input; F6 exits. Purple dots show mapped contact positions; Android Show taps shows touches received by the emulator."/>
     </StackPanel>
 </Window>

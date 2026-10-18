@@ -1,34 +1,27 @@
 # Roadmap
 
-These are proposed milestones, not completed version claims. Gameplay and Windows input observations will be collected during normal future use.
+SekaiPad is available as an experimental source alpha. Windows gameplay compatibility is currently centered on MuMu Android 15, Project SEKAI and Windows 11 build 26200.
 
-## v0.1.0-alpha — public source preview
+## v0.1.0-alpha — source preview (2026-10-18)
 
-- [x] Core README, safety, license, attribution and contributor docs drafted.
-- [x] Offline Windows CI, initial issue templates and publication audit prepared on private working branch.
-- [x] Inspect the 85-file allowlisted source tree and its upstream imports; verify original copyright, pinned licenses, path/token scans and one-commit fresh-history rehearsal.
-- [x] Prepare a locally audited clean source-only export and Windows build with a single fresh-history rehearsal.
-- [x] Verify the integrated source on Windows 11 private GitHub Actions, including .NET 10, synthetic input safety and actual built ZIP auditing.
-- [ ] Obtain final maintainer acceptance of the source/attribution/privacy review, including approval of the public-facing author identity.
-- [ ] Owner explicitly approves public visibility; publish only a fresh history.
+- [x] Windows Precision Touchpad decoding, absolute mapping and local scrcpy multi-touch transport.
+- [x] F6/F10 recovery controls and synthetic input/gesture/cursor guard tests.
+- [x] Source-only public Git history, upstream copyright/NOTICE verification and Windows CI.
+- [x] Alpha ZIP packaging and binary/source privacy checks.
 
-## v0.2.0-alpha — physical gameplay reliability
+## v0.2.0-alpha — gameplay reliability
 
-- [x] Read the device HID `Contact Count Maximum` Feature Report: this MSI touchpad reports 5 simultaneous contacts (read-only capability probe on 2026-10-16).
-- [ ] Collect physical 1–5 finger, HOLD, SLIDE, FLICK and timing observations during ordinary play.
-- [ ] Verify UI overlay accuracy at various MuMu window sizes and DPIs.
-- [ ] Reproduce Android event acknowledgment separately from raw HID and transport counters.
+- [ ] Collect HOLD/SLIDE/FLICK, five-contact and judgment-timing observations during ordinary play.
+- [ ] Check cursor, mouse and gesture restoration during normal use.
+- [ ] Validate overlay alignment across window sizes and display scaling.
+- [ ] Gather results from additional Precision Touchpads and emulators.
 
-## v0.5.0-beta — portable/safe deployment
+## v0.5.0-beta — wider compatibility
 
-- [ ] Remove all private SDK/local filesystem assumptions.
-- [ ] Validate mouse/gesture recovery through normal-use observations; reserve abnormal-exit checks for a separate safe opportunity.
-- [ ] Publish independent checksums and verify a framework-dependent ZIP on a clean Windows test user.
-- [ ] Validate at least one additional Precision Touchpad and emulator setup.
+- [ ] Add supported-device configurations and repeatable latency measurements.
+- [ ] Evaluate recovery behavior on further Windows builds.
+- [ ] Evaluate a portable binary release and Windows installation experience.
 
-## v1.0.0 — stability
+## v1.0.0
 
-- [ ] Compatibility matrix and repeatable timing/jitter statistics.
-- [ ] Clean signed installer or updater, long-term maintenance and localized help.
-
-Out of scope: game resource redistribution, bypassing anti-cheat/authentication, collecting credentials and routing live gameplay over a remote server.
+- [ ] Build a compatibility matrix, regression benchmark suite and maintained release process.

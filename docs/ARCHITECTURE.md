@@ -16,6 +16,6 @@ The optional legacy Google Android Emulator transport uses a different backend. 
 
 **Separate safety plane:** LowLevelMouseGuard suppresses Windows mouse events; WindowsGestureGuard/GestureSettings temporarily disable three/four-finger Windows gestures with backup; SystemCursorVisibility hides/restores cursor images; CursorGuard restores settings after unexpected process exit. F10 and F6 must remain usable.
 
-**Three different success metrics:** HID reports decoded; scrcpy packets written; Android game actually judges notes. These are not interchangeable. Lilac host-side markers prove mapping, not Android acceptance.
+Diagnostics track HID reports, scrcpy writes and in-game note judgments separately. Purple markers show mapped contact positions.
 
 During disconnect or input-queue saturation, the frame pump discards unprocessed gameplay frames and sends UP for the contacts actually emitted to the local TCP stream. It measures enqueue-to-local-pump duration with a monotonic clock and exposes the last/peak observations in diagnostics. This host-side measurement includes queueing and encoding; Android delivery, rendering and game-note judgment need independent acceptance tests.

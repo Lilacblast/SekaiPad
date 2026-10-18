@@ -2,7 +2,7 @@
 
 **Use your Windows Precision Touchpad as a multi-touch controller for Android rhythm games.**
 
-> **Experimental alpha / source preview.** Rhythm mode temporarily suppresses mouse input and changes Windows touchpad gestures. Test the emergency restore keys before playing.
+> **Experimental source alpha.** Rhythm mode temporarily controls Windows mouse and touchpad gestures. Learn F10 (restore) and F6 (exit) before playing.
 
 SekaiPad converts multiple physical Precision Touchpad contacts into independent Android touch events. Each contact retains its own finger identity and mapped screen position for simultaneous holds, slides and flicks.
 
@@ -26,11 +26,9 @@ Windows normally also interprets the touchpad as a mouse and system-gesture inpu
 - ✅ Absolute full-screen mapping and optional lane-focused mapping.
 - ✅ Multi-finger touch serialization and control transport over local scrcpy.
 - ✅ Host-side mapped-contact markers; native Android touch-dot option.
-- ✅ F10 restoration and crash-recovery design for desktop input / Windows gesture settings.
+- ✅ F10 return to normal input and independent crash-recovery guard.
 - ✅ Tester-reported multi-finger play on a Project SEKAI **APPEND** chart using a laptop touchpad.
-- 🧪 **Planned observations during normal play:** note judgment timing and extended HOLD/SLIDE/FLICK reliability; cross-device support needs additional hardware reports. See [compatibility notes](docs/COMPATIBILITY.md).
-- ⚠️ The Windows gesture suppression path uses a Windows 11-specific, undocumented shell interface. Compatibility is currently verified only for the tested Windows build.
-- ⚠️ The mouse suppression path affects *all* mice in the Windows session while rhythm mode is active. Keyboard emergency keys remain active.
+- 🧪 **Ongoing:** note timing, sustained holds/slides/flicks and device compatibility. See [compatibility](docs/COMPATIBILITY.md).
 
 ## Shortcuts
 
@@ -42,7 +40,7 @@ Windows normally also interprets the touchpad as a mouse and system-gesture inpu
 | **F10** | Restore normal Windows mouse and gesture behavior |
 | **F6** | Exit SekaiPad, releasing active touches |
 
-`Esc` is not captured by SekaiPad. **Confirm F10 and F6 work before using the touchpad for gameplay.**
+`Esc` remains available to the emulator. Keep a physical keyboard accessible for F10/F6.
 
 ## Build from source
 
@@ -59,17 +57,17 @@ dotnet restore tests/SekaiPad.ScrcpySmoke/SekaiPad.ScrcpySmoke.csproj
 dotnet run --project tests/SekaiPad.ScrcpySmoke/SekaiPad.ScrcpySmoke.csproj -c Release --no-restore
 ```
 
-No official installer or stable release is available yet. A **framework-dependent, source-built preview package** can be prepared with `tools/package-alpha.ps1` after the release checks pass. MuMu, the official scrcpy server and game installation are prepared separately; `tools/stage-scrcpy-server.ps1` can stage the scrcpy server into a local unpacked preview.
+Build an experimental Windows ZIP with `tools/package-alpha.ps1`. It requires the .NET 10 Desktop Runtime; set up MuMu, the game and the official scrcpy server separately. Use `tools/stage-scrcpy-server.ps1` to add the server to your extracted preview.
 
 ## Safety and privacy
 
-SekaiPad sends game input locally from the desktop to the selected emulator. During rhythm mode it can modify four `HKCU` Precision Touchpad gesture settings and install a low-level Windows mouse hook. Its restoration handlers are designed for F10, F6, bridge failures and shutdown; an independent guard handles unexpected process exits. **Windows updates, other gesture utilities or unusual failures may still interfere.** Keep a physical keyboard available.
+Rhythm mode blocks **all Windows mice** and suspends three-/four-finger system gestures, while touchpad contacts control the local emulator. Press **F10** to restore desktop input or **F6** to exit. Gesture suppression is tested on Windows build 26200; crash restoration is still under real-device evaluation. See [safety details](docs/SAFETY.md).
 
-Read [safety details](docs/SAFETY.md) and [the compatibility/testing guide](docs/BUILDING.md) before use. Redact account details, authentication tokens and personal game data before sharing diagnostic screenshots.
+For setup, see [building instructions](docs/BUILDING.md). Share only sanitized diagnostic screenshots and logs.
 
 ## License and credits
 
-Original SekaiPad code: **MIT**, see [LICENSE](LICENSE). Third-party components retain their respective licenses and notices; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and any pre-existing `THIRD_PARTY_LICENSES.md` in the source tree.
+Original SekaiPad code is [MIT licensed](LICENSE). Upstream copyrights and license texts are listed in [third-party notices](THIRD_PARTY_NOTICES.md).
 
 Thanks to [RawInput.Touchpad](https://github.com/emoacht/RawInput.Touchpad) and [scrcpy](https://github.com/Genymobile/scrcpy). The optional legacy Android Emulator protocol definitions originate from AOSP.
 

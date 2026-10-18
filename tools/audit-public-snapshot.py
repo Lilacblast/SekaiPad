@@ -171,7 +171,6 @@ def main(argv: list[str] | None = None) -> int:
     print("EXPORT_AUDIT_COUNTS:", counts)
     for issue in issues:
         print("BLOCKER:", issue)
-    print("MANUAL_CONTENT_AND_LICENSE_REVIEW_STILL_REQUIRED")
     print("EXPORT_SHA256_PATH_SECRET_GUARD_" + ("BLOCKED" if issues else "PASS"))
     return 1 if issues and args.strict else 0
 

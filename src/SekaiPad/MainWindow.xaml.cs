@@ -117,7 +117,7 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             try { _hostOverlay.Disable(); } catch { }
-            StatusText.Text = "Host touch indicator failure: " + ex.Message;
+            StatusText.Text = "Touch overlay failed: " + ex.Message;
         }
     }
 
@@ -130,8 +130,9 @@ public partial class MainWindow : Window
         bool registered = _touchpadPresent &&
                           TouchpadHelper.RegisterInput(_source?.Handle ?? IntPtr.Zero);
         StatusText.Text = registered
-            ? "Precision Touchpad detected; Raw Input registered. Bridge OFF."
-            : "No Precision Touchpad Raw Input collection found or registration failed.";
+            ? "Precision Touchpad ready."
+            : _touchpadPresent ? "Touchpad Raw Input registration failed."
+            : "No Windows Precision Touchpad detected.";
         DrawPreviewGrid();
         RegisterModeHotkeys();
     }
@@ -186,7 +187,7 @@ public partial class MainWindow : Window
         {
             _cursorHideFailed = true;
             try { _cursorVisibility.Restore(); } catch { /* Crash guard also restores. */ }
-            StatusText.Text = "Cursor hiding unavailable (game touch still works): " + ex.Message;
+            StatusText.Text = "Cursor hiding failed: " + ex.Message;
         }
     }
 
@@ -258,7 +259,7 @@ public partial class MainWindow : Window
                 TouchpadHelper.MaxX, TouchpadHelper.MinY, TouchpadHelper.MaxY);
             if (frame != null && !_bridge.Send(frame))
             {
-                Disable("Bridge input rejected - disabled to avoid delayed notes");
+                Disable("Touch transfer interrupted; rhythm mode stopped.");
                 return false;
             }
         }
@@ -414,15 +415,14 @@ public partial class MainWindow : Window
             return;
 
         if (_enabled)
-            Disable(setting + " changed: all held contacts released; re-enable bridge.");
+            Disable(setting + " changed; active contacts released. Press F7/F8 to resume.");
 
         _mapping = CreateTouchMapping(BackendChoice?.SelectedIndex == 0);
         FlickChoice.IsEnabled = _mapping.Mode == TouchMappingMode.GameLanes;
         DrawPreviewGrid();
         PreviewContacts.Children.Clear();
-        StatusText.Text = setting + " set to " +
-            (MappingChoice.SelectedIndex == 1 ? "full-screen" : "12 gameplay lanes") +
-            ". Bridge " + (_enabled ? "ON" : "OFF") + ".";
+        StatusText.Text = setting + ": " +
+            (MappingChoice.SelectedIndex == 1 ? "full screen" : "12 lanes") + ".";
     }
 
     private async void Connect_Click(object sender, RoutedEventArgs e) =>
@@ -457,7 +457,7 @@ public partial class MainWindow : Window
                 }
                 catch (Exception markerError)
                 {
-                    touchDotsStatus = " Emulator touch-dot overlay unavailable: " + markerError.Message;
+                    touchDotsStatus = " Android touch markers failed: " + markerError.Message;
                 }
             }
             if (_isClosing || !ReferenceEquals(_bridge, connectedBridge))
@@ -469,7 +469,7 @@ public partial class MainWindow : Window
             DisconnectButton.IsEnabled = true;
             ToggleButton.IsEnabled = _touchpadPresent;
             StatusText.Text = (mumu ? "MuMu Android 15 scrcpy" : "Google Emulator gRPC")
-                              + " connected. Bridge OFF." + touchDotsStatus;
+                              + " connected." + touchDotsStatus;
             return true;
         }
         catch (Exception ex)
@@ -542,7 +542,7 @@ public partial class MainWindow : Window
             DrawPreviewGrid();
             if (_bridge?.Connected != true && !await ConnectBridgeAsync())
             {
-                StatusText.Text = "Could not enter rhythm mode. Connect the emulator first.";
+                StatusText.Text = "Rhythm mode requires an emulator connection.";
                 return;
             }
             if (_isClosing || _bridge?.Connected != true) return;
@@ -639,13 +639,13 @@ public partial class MainWindow : Window
             try { _hostOverlay.Enable(); _overlayPending = true; }
             catch (Exception ex)
             {
-                StatusText.Text = "Rhythm active but mapped-touch overlay unavailable: " + ex.Message;
+                StatusText.Text = "Mapped-touch overlay failed: " + ex.Message;
             }
         }
     }
 
     private void ReturnToNormalMode() =>
-        Disable("NORMAL MODE: Windows touchpad, no Android touches. F7/F8 enter rhythm.");
+        Disable("F7/F8 enter rhythm mode.");
 
     private async void Disconnect_Click(object sender, RoutedEventArgs e)
     {
@@ -691,7 +691,7 @@ public partial class MainWindow : Window
     {
         if (_enabled)
         {
-            Disable("Touch bridge disabled");
+            Disable("Touch bridge off");
         }
         else if (_bridge?.Connected == true)
             EnterRhythmMode();

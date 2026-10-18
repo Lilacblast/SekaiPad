@@ -10,10 +10,10 @@ Gesture suppression uses an undocumented Windows Shell cache interface, tested o
 
 If recovery hotkeys fail, use a **physical keyboard** to close SekaiPad in Task Manager. Windows releases global hooks upon process termination; the crash guard attempts to restore cursor and gesture settings. If that fails, restarting the Windows user session may be necessary.
 
-CI verifies the crash guard lifecycle, PID/start-time checks and acknowledgment cleanup using only a dummy child process and synthetic markers. Hosted tests leave global Windows mouse, cursor and gesture settings unchanged; real crash-recovery performance remains for an attended device check.
+CI verifies crash-guard lifecycle and recovery policies with synthetic input. Real system-wide crash restoration remains to be tested on a supported Windows device.
 
 Crash-recovery markers remain available after a failed system cursor restoration. The independent helper retries up to three times and retains the marker for diagnosis when restoration fails.
 
-Never run with Administrator privileges merely to bypass a safety failure, disable the Precision Touchpad device or attempt to block keyboard input. Do not upload accounts, raw HID captures, full logcat dumps, dumps or private screenshots to public issues.
+Run as a standard Windows user, with your physical keyboard available. Keep account data, raw HID captures, full logcat dumps and private screenshots out of public issues.
 
 SekaiPad sends input to the selected local emulator. Host contact circles show mapped HID positions, while gameplay judgments require separate confirmation in game. The Android **Show taps** setting is normally restored to its prior value; after an unexpected exit, check Android Developer options and restore that setting if needed.

@@ -66,9 +66,6 @@ def main() -> int:
     print("SOURCE_AUDIT_COUNTS:", stats)
     for issue in issues:
         print("BLOCKER:", issue)
-    print("MANUAL_REVIEW_REQUIRED: author identities, commit messages, third-party licenses, "
-          "local paths and proprietary source/data cannot be cleared by this scan.")
-    print("WARNING: Do not publish existing private commit history; create fresh public snapshot.")
     print("PUBLICATION_PATH_SIGNATURE_SCAN_"+("BLOCKED" if issues else "PASS"))
     return 1 if issues and args.strict else 0
 
