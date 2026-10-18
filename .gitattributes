@@ -1,0 +1,9 @@
+# A public source export always uses UTF-8 text with LF line endings.
+# Explicit LF checkout avoids private-manifest hash drift on Windows.
+* text eol=lf
+
+# Keep WSL scripts executable with Unix line endings even on Windows.
+*.sh text eol=lf
+*.py text eol=lf
+*.S text eol=lf
+*.md text eol=lf

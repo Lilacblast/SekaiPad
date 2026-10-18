@@ -1,0 +1,56 @@
+name: Cursor recovery policy (synthetic)
+
+on:
+  push:
+    branches: [experiment/cursor-recovery]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: .NET 10 / Windows, no system input changes
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout reviewed source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1, Node 24
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Setup .NET 10 SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0, Node 24
+        with:
+          dotnet-version: 10.0.x
+      - name: Source and copyright audit
+        shell: pwsh
+        run: |
+          python tools/audit-publication.py --strict
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/audit-public-snapshot.py --root . --strict --allow-git-metadata
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/audit-third-party-provenance.py --root .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build main crash recovery helper
+        shell: pwsh
+        run: |
+          dotnet restore src/SekaiPad.CursorGuard/SekaiPad.CursorGuard.csproj
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet build src/SekaiPad.CursorGuard/SekaiPad.CursorGuard.csproj -c Release --no-restore
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Check marker retention and no-action paths via injected callbacks
+        shell: pwsh
+        run: |
+          dotnet run --project tests/SekaiPad.CursorRecoveryPolicySmoke/SekaiPad.CursorRecoveryPolicySmoke.csproj -c Release
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Kill only a synthetic child to test watchdog lifecycle
+        shell: pwsh
+        run: |
+          $guard = Join-Path $PWD 'src/SekaiPad.CursorGuard/bin/Release/net10.0-windows/SekaiPad.CursorGuard.exe'
+          dotnet run --project tests/SekaiPad.WatchdogSmoke/SekaiPad.WatchdogSmoke.csproj -c Release -- --guard $guard
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+# Never install keyboard/mouse hooks, replace system cursor images, modify
+# Windows PTP gesture settings, automate Android or upload binary artifacts.

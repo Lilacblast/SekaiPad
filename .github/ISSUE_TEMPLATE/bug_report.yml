@@ -1,0 +1,53 @@
+name: Bug report (sanitized)
+description: Report a reproducible bug without credentials or private input captures
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not attach account screenshots, passwords, tokens, APKs, raw HID dumps
+        or full unredacted logs. Report security issues privately.
+  - type: input
+    id: version
+    attributes:
+      label: SekaiPad version or commit
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Windows edition, build and architecture
+    validations:
+      required: true
+  - type: input
+    id: hardware
+    attributes:
+      label: Precision Touchpad manufacturer/model (no serial number)
+    validations:
+      required: true
+  - type: input
+    id: emulator
+    attributes:
+      label: Android emulator/version
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: checkboxes
+    id: recovery
+    attributes:
+      label: Input recovery and privacy
+      options:
+        - label: I tested whether F10 restores normal Windows mouse/gesture input.
+        - label: I removed account data and other sensitive details.
+          required: true

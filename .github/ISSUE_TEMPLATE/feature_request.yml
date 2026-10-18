@@ -1,0 +1,20 @@
+name: Feature request
+description: Propose a bounded enhancement to the local touch-to-Android bridge
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: test
+    attributes:
+      label: How would you test it (including F10/F6 restoration)?

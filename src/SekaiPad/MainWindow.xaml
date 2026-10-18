@@ -1,0 +1,85 @@
+<Window x:Class="SekaiPad.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SekaiPad · Absolute Touchpad Bridge" Height="930" Width="850"
+        Background="#FAF8FF">
+    <StackPanel Margin="24">
+        <TextBlock Text="SekaiPad" FontSize="28" FontWeight="SemiBold" Foreground="#80519C"/>
+        <TextBlock Text="Windows Precision Touchpad → Android multi-touch (local only)" Margin="0,3,0,18"/>
+        <StackPanel Orientation="Horizontal">
+            <ComboBox x:Name="BackendChoice" Width="167" Margin="0,0,10,0"
+                      SelectedIndex="0" SelectionChanged="BackendChoice_SelectionChanged">
+                <ComboBoxItem Content="MuMu · Android 15"/>
+                <ComboBoxItem Content="Google Emulator"/>
+            </ComboBox>
+            <TextBox x:Name="EndpointBox" Width="200" Text="127.0.0.1:5555"
+                     Margin="0,0,10,0" VerticalContentAlignment="Center"/>
+            <Button x:Name="ConnectButton" Content="Connect" Click="Connect_Click"
+                    Padding="12,7" Margin="0,0,8,0"/>
+            <Button x:Name="DisconnectButton" Content="Disconnect" Click="Disconnect_Click"
+                    Padding="12,7" IsEnabled="False"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+            <Button x:Name="ToggleButton" Content="Enable touch bridge" Click="Toggle_Click"
+                    Padding="12,7" IsEnabled="False" Margin="0,0,8,0"/>
+            <Button Content="Release all" Click="Release_Click" Padding="12,7" Margin="0,0,10,0"/>
+            <ComboBox x:Name="MappingChoice" Width="173" Margin="0,0,10,0"
+                      SelectedIndex="1" SelectionChanged="MappingChoice_SelectionChanged">
+                <ComboBoxItem Content="Game lanes · optional"/>
+                <ComboBoxItem Content="Full screen · absolute"/>
+            </ComboBox>
+            <ComboBox x:Name="FlickChoice" Width="132" SelectedIndex="1" IsEnabled="False"
+                      ToolTip="Flick speed adjusts lane mode; full-screen mode uses absolute positions."
+                      SelectionChanged="FlickChoice_SelectionChanged">
+                <ComboBoxItem Content="Fine swipes"/>
+                <ComboBoxItem Content="Normal flick"/>
+                <ComboBoxItem Content="Fast flick"/>
+            </ComboBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,11,0,2">
+            <Button x:Name="FullModeButton" Content="F7  Full-screen rhythm" Click="FullMode_Click"
+                    Padding="9,6" Margin="0,0,7,0"/>
+            <Button x:Name="LanesModeButton" Content="F8  Lane rhythm" Click="LanesMode_Click"
+                    Padding="9,6" Margin="0,0,7,0"/>
+            <Button x:Name="SwitchModeButton" Content="F9  Switch" Click="SwitchMode_Click"
+                    Padding="9,6" Margin="0,0,7,0"/>
+            <Button x:Name="NormalModeButton" Content="F10  Normal Windows" Click="NormalMode_Click"
+                    Padding="9,6" Margin="0,0,7,0"/>
+            <Button x:Name="ExitModeButton" Content="F6  Exit app" Click="ExitMode_Click"
+                    Padding="9,6"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+            <CheckBox x:Name="ShowTouchDotsCheck" IsChecked="True"
+                      Checked="ShowTouchDots_Changed" Unchecked="ShowTouchDots_Changed"
+                      Foreground="#80519C" FontSize="13" VerticalAlignment="Center"
+                      Content="Show touch points inside MuMu (Android tap circles)" />
+            <CheckBox x:Name="HostTouchOverlayCheck" Margin="15,0,0,0"
+                      IsChecked="False" Checked="HostTouchOverlay_Changed"
+                      Unchecked="HostTouchOverlay_Changed"
+                      ToolTip="Diagnostic overlay. Keep off during play for minimum input/display latency."
+                      Foreground="#80519C" FontSize="13" VerticalAlignment="Center"
+                      Content="Draw mapped touch circles over MuMu (diagnostics)"/>
+        </StackPanel>
+        <TextBlock x:Name="ModeStateText" Text="NORMAL MODE · Touchpad controls Windows · Android touch bridge off"
+                   Margin="0,7,0,2" FontSize="14" FontWeight="Bold" Foreground="#80519C"/>
+        <TextBlock Text="Hotkeys: F7 full-screen · F8 lanes · F9 switch · F10 restore Windows input · F6 exit."
+                   Foreground="#686078" FontSize="11" Margin="0,1,0,5"/>
+        <TextBlock x:Name="StatusText" Text="Initializing touchpad…"
+                   Margin="0,14,0,8" FontWeight="SemiBold" TextWrapping="Wrap"/>
+        <TextBlock Text="Absolute mapping preview · virtual 1920 × 1080 screen" Foreground="#80519C" Margin="0,10,0,2"/>
+        <Border Width="576" Height="324" HorizontalAlignment="Left"
+                Margin="0,4,0,4" CornerRadius="6" BorderBrush="#B69ECF"
+                BorderThickness="1" ClipToBounds="True" Background="#171A2F">
+            <Grid>
+                <Canvas x:Name="PreviewGrid" Width="576" Height="324"/>
+                <Canvas x:Name="PreviewContacts" Width="576" Height="324"/>
+            </Grid>
+        </Border>
+        <TextBlock Text="Raw contacts (device-space):" Foreground="#80519C" Margin="0,10,0,2"/>
+        <TextBox x:Name="ContactsBox" FontFamily="Consolas" FontSize="13" Text="—"
+                 IsReadOnly="True" VerticalScrollBarVisibility="Auto" Height="132"
+                 Padding="8" Background="White"/>
+        <TextBlock Margin="0,12,0,0" TextWrapping="Wrap" Foreground="#666666"
+                   Text="Light finger contact = Android DOWN (no click). Lift = UP; moving contact = drag, slide, or flick. Default Full screen maps the whole pad to the whole landscape screen. The optional game-lanes mode emphasizes the judgment area. Changing mapping releases held contacts for safety. In rhythm mode the Windows mouse is frozen and its clicks/wheel are blocked (including an external mouse), while raw touchpad-to-Android continues. Windows three-/four-finger system gestures are also suspended during rhythm mode. F10 / disconnect / exit restores normal input. The keyboard and F6/F10 remain available. Lilac host overlay dots visualize mapped HID positions over MuMu even when Android Show taps does not draw markers for injected input; the scrcpy packet counters below help distinguish drawing from actual Android delivery."/>
+    </StackPanel>
+</Window>

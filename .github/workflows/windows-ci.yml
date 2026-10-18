@@ -1,0 +1,124 @@
+name: Windows build and synthetic tests
+
+on:
+  push:
+    branches: [main, 'review/**']
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      private_runtime_probe:
+        description: 'Upload a short-lived, private .NET 10 device-validation bundle'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# Preserve the strict source-only manifest after Python's synthetic tests.
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+
+jobs:
+  build-and-test:
+    name: .NET 10 / Windows (no emulator)
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1, Node 24
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0, Node 24
+        with:
+          dotnet-version: 10.0.x
+      - name: Setup Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0, Node 24
+        with:
+          python-version: '3.12'
+      - name: Verify pinned GitHub Actions and private artifact access policy
+        shell: pwsh
+        run: python tools/audit-github-actions.py --root .
+      - name: Audit public Git history (read-only)
+        shell: pwsh
+        run: python tools/audit-publication.py --strict
+      - name: Verify pinned copyright and original third-party source revisions
+        shell: pwsh
+        run: python tools/audit-third-party-provenance.py --root .
+      - name: Verify exact reviewed-source manifest if this is the fresh public snapshot
+        shell: pwsh
+        run: |
+          if (Test-Path PUBLICATION_MANIFEST.sha256) {
+            python tools/audit-public-snapshot.py --root . --strict --allow-git-metadata
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+      - name: Test the publication gates on synthetic fixture repositories
+        shell: pwsh
+        run: python -m unittest discover -s tests -p 'test_audit_*.py' -v
+      - name: Restore app and offline test dependencies
+        shell: pwsh
+        run: |
+          dotnet restore src/SekaiPad/SekaiPad.csproj
+          dotnet restore src/SekaiPad.CursorGuard/SekaiPad.CursorGuard.csproj
+          dotnet restore tests/SekaiPad.ScrcpySmoke/SekaiPad.ScrcpySmoke.csproj
+          dotnet restore tests/SekaiPad.SafetySmoke/SekaiPad.SafetySmoke.csproj
+          dotnet restore tests/SekaiPad.CursorRecoveryPolicySmoke/SekaiPad.CursorRecoveryPolicySmoke.csproj
+          dotnet restore tests/SekaiPad.WatchdogSmoke/SekaiPad.WatchdogSmoke.csproj
+      - name: Build the app and cursor/gesture recovery helper
+        shell: pwsh
+        run: |
+          dotnet build src/SekaiPad/SekaiPad.csproj --no-restore -c Release
+          dotnet build src/SekaiPad.CursorGuard/SekaiPad.CursorGuard.csproj --no-restore -c Release
+      - name: Run synthetic touch and transport regression
+        shell: pwsh
+        run: dotnet run --no-restore --project tests/SekaiPad.ScrcpySmoke/SekaiPad.ScrcpySmoke.csproj -c Release
+      - name: Check gesture-build gate and backup integrity without changing Windows input
+        shell: pwsh
+        run: dotnet run --no-restore --project tests/SekaiPad.SafetySmoke/SekaiPad.SafetySmoke.csproj -c Release
+      - name: Validate cursor-recovery marker retention without touching system cursors
+        shell: pwsh
+        run: dotnet run --no-restore --project tests/SekaiPad.CursorRecoveryPolicySmoke/SekaiPad.CursorRecoveryPolicySmoke.csproj -c Release
+      - name: Verify independent crash guard handles dummy-parent termination without altering input
+        shell: pwsh
+        run: |
+          $guard = Join-Path $PWD 'src/SekaiPad.CursorGuard/bin/Release/net10.0-windows/SekaiPad.CursorGuard.exe'
+          dotnet run --no-restore -c Release --project tests/SekaiPad.WatchdogSmoke/SekaiPad.WatchdogSmoke.csproj -- --guard $guard
+      - name: Verify real compiled alpha ZIP and pinned notices (no upload)
+        shell: pwsh
+        run: |
+          ./tools/package-alpha.ps1 -Version '0.1.0-alpha.ci-check'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/audit-alpha-zip.py --root . --zip 'dist/SekaiPad-0.1.0-alpha.ci-check-win-x64.zip'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build opt-in private local Windows test bundle (no app execution)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.private_runtime_probe && github.event.repository.private == true && github.ref == 'refs/heads/experiment/dotnet10' }}
+        shell: pwsh
+        run: |
+          ./tools/package-alpha.ps1 -Version '0.1.0-alpha.net10-localtest'
+          $probes = 'dist/private-net10-probes'
+          New-Item -ItemType Directory -Force -Path $probes | Out-Null
+          foreach ($test in @('SekaiPad.SafetySmoke', 'SekaiPad.WatchdogSmoke')) {
+            $source = "tests/$test/bin/Release/net10.0-windows"
+            foreach ($extension in @('.exe','.dll','.deps.json','.runtimeconfig.json')) {
+              $item = Join-Path $source ($test + $extension)
+              if (!(Test-Path $item)) { throw "Local probe missing: $item" }
+              Copy-Item $item (Join-Path $probes ($test + $extension))
+            }
+          }
+          Compress-Archive -Path "$probes/*" -DestinationPath 'dist/net10-safe-probes.zip' -CompressionLevel Optimal
+          if (!(Test-Path 'dist/net10-safe-probes.zip')) { throw 'Opt-in test bundle missing' }
+      - name: Upload 1-day private experiment artifacts for owner-only validation
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.private_runtime_probe && github.event.repository.private == true && github.ref == 'refs/heads/experiment/dotnet10' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2, Node 24
+        with:
+          name: sekaipad-dotnet10-private-runtime-probe
+          path: |
+            dist/SekaiPad-0.1.0-alpha.net10-localtest-win-x64.zip
+            dist/net10-safe-probes.zip
+          retention-days: 1
+          if-no-files-found: error
+
+# Deliberately no live HID/game automation, Windows mouse hooks or
+# automatic/public binary releases; private runtime probes require opt-in.
