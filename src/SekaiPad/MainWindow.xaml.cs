@@ -542,7 +542,7 @@ public partial class MainWindow : Window
             DrawPreviewGrid();
             if (_bridge?.Connected != true && !await ConnectBridgeAsync())
             {
-                StatusText.Text = "Rhythm mode requires an emulator connection.";
+                StatusText.Text = "Rhythm mode could not start: emulator connection failed.";
                 return;
             }
             if (_isClosing || _bridge?.Connected != true) return;
